@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h2 class="text-2xl font-bold mb-4">Welcome, {{ username }}!</h2>
+    <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <h3 class="text-xl font-bold mb-4">Authentication Options</h3>
+        <ul class="list-disc list-inside mb-4">
+            <li class="mb-2">
+                <a href="{{ url_for('change_password') }}" class="text-blue-500 hover:text-blue-700">Change Password</a>
+            </li>
+            <li class="mb-2">
+                <a href="{{ url_for('generate_totp_secret') }}" class="text-blue-500 hover:text-blue-700">Set up TOTP (Two-Factor Authentication)</a>
+            </li>
+            <li class="mb-2">
+                <a href="{{ url_for('webauthn_register') }}" class="text-blue-500 hover:text-blue-700">Register WebAuthn</a>
+            </li>
+            <li class="mb-2">
+                <a href="{{ url_for('webauthn_authenticate') }}" class="text-blue-500 hover:text-blue-700">Authenticate with WebAuthn</a>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

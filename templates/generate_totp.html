@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-md mx-auto">
+    <h2 class="text-2xl font-bold mb-4">Set up TOTP (Two-Factor Authentication)</h2>
+    <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <p class="mb-4">Click the button below to generate a QR code for your TOTP setup:</p>
+        <form method="POST" class="mb-4">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Generate TOTP QR Code
+            </button>
+        </form>
+        <div id="qr-code" class="text-center"></div>
+        <p class="mt-4">Scan this QR code with your authenticator app to set up TOTP.</p>
+        <div id="verify-totp" class="mt-4" style="display: none;">
+            <input type="text" id="totp-code" placeholder="Enter TOTP code" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            <button id="verify-button" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-2">
+                Verify
+            </button>
+        </div>
+        <a href="{{ url_for('dashboard') }}" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800 mt-4">
+            Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<script>
+document.querySelector('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const response = await fetch('{{ url_for("generate_totp_secret") }}', { method: 'POST' });
+    const blob = await response.blob();
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(blob);
+    document.getElementById('qr-code').innerHTML = '';
+    document.getElementById('qr-code').appendChild(img);
+    document.getElementById('verify-totp').style.display = 'block';
+});
+
+document.getElementById('verify-button').addEventListener('click', async () => {
+    const code = document.getElementById('totp-code').value;
+    const response = await fetch('{{ url_for("verify_totp") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code: code }),
+    });
+    const result = await response.json();
+    if (result.status === 'success') {
+        alert('TOTP verified successfully!');
+        window.location.href = '{{ url_for("dashboard") }}';
+    } else {
+        alert('TOTP verification failed. Please try again.');
+    }
+});
+</script>
+{% endblock %}
